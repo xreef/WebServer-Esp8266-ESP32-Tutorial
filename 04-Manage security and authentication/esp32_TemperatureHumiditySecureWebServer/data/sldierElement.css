@@ -1,0 +1,63 @@
+@import url(https://fonts.googleapis.com/css?family=Josefin+Slab:100);
+
+.animate {
+    transition: transform 0.3s ease-out;
+}
+
+.sliderContainer{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.slider-wrap {
+    width: 768px;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    margin-left: -384px; /*calc(-(768px/2));*/
+    /*top: 20%;*/
+    /*margin-top: -225px;*/
+}
+
+.slide-wrapper{
+    /*display: table-cell;*/
+    width: 768px;
+    position: relative;
+}
+
+.slider {
+    /*width: 100%;*/
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.holder {
+    display: flex;
+    position: relative;
+    height: 100%;
+}
+
+.slide-image{
+    /*width: 100%;*/
+    width: 768px;
+}
+
+.ms-touch.slider {
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    -ms-overflow-style: none;
+    /* Hides the scrollbar. */
+
+    -ms-scroll-chaining: none;
+    /* Prevents Metro from swiping to the next tab or app. */
+
+    -ms-scroll-snap-type: mandatory;
+    /* Forces a snap scroll behavior on your images. */
+
+    -ms-scroll-snap-points-x: snapInterval(0%, 100%);
+    /* Defines the y and x intervals to snap to when scrolling. */
+}
