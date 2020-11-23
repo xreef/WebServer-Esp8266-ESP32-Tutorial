@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="./sldierElement.css">
+    <link rel="stylesheet" type="text/css" href="./floatButton.css">
+    <script src="iot-widget.min.js"></script>
+    <script src="sliderManager.js"></script>
+
+    <meta charset="UTF-8">
+    <title>Temperature humidity www.mischianti.org</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+
+            background: #76b852; /* fallback for old browsers */
+            background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+            background: -moz-linear-gradient(right, #76b852, #8DC26F);
+            background: -o-linear-gradient(right, #76b852, #8DC26F);
+            background: linear-gradient(to left, #76b852, #8DC26F);
+        }
+
+        .titleContainer {
+            font-size:  6vw;;
+            text-align: center;
+            width: 100%;
+            height: 16%;
+            /*padding: 10px;*/
+        }
+        .sliderContainer {
+            height: 84%;
+            position: relative;
+        }
+
+        .humidity-container,
+        .termometer-container{
+            width: 768px;
+            height: 100%;
+        }
+        .humidity-container{
+            height: 70%;
+        }
+    </style>
+</head>
+<body>
+<div class="titleContainer">Temperature humidity</div>
+<div class="sliderContainer">
+    <div class="slider-wrap">
+        <div class="slider" id="slider">
+            <div class="holder">
+                <div class="slide-wrapper">
+
+                    <div class="humidity-container" id="humidity-container"></div>
+                </div>
+                <div class="slide-wrapper">
+                    <div class="termometer-container" id="termomter-container" ></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var sliderElement = document.getElementById('slider');
+    var sliderImageElements = document.querySelectorAll(".slide-wrapper");
+    var holderElement = document.querySelector(".holder");
+    var animateElements = document.querySelectorAll('.animate');
+
+    sliderInitialization(  sliderElement,
+        sliderImageElements,
+        holderElement,
+        animateElements,
+        2);
+
+    var container = document.getElementById('humidity-container');
+    var hw = new Widget.Humidity(container, 0);
+    hw.draw();
+
+    var container2 = document.getElementById('termomter-container');
+    var tw = new Widget.Termometer(container2, 0);
+    tw.draw();
+
+</script>
+
+    <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        var token = getCookie('ESPSESSIONID');
+         debugger
+        function debounce(fn, threshold) {
+            threshold = threshold || 300;
+            var timer;
+            return function() {
+                if (!timer) {
+                    fn.apply(this, arguments);
+                }
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    timer = null;
+                }, threshold);
+            };
+        };
+
+        var requestTempHum = function(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // Typical action to be performed when the document is ready:
+                    var res = JSON.parse(xhttp.responseText);
+                    hw.setHumidity(res.humidity);
+                    tw.setTemperature(res.temp);
+                }
+            };
+            xhttp.onerror = function () {
+                alert("Status code is " + this.status + " click F12 and check what is the problem on console");
+            };
+
+            xhttp.open("GET", "/temperatureHumidity", true);
+            xhttp.send();
+        }
+
+        var debouncedRequestTempHum = debounce(requestTempHum, 400);
+
+        var refresh = function(){
+            debouncedRequestTempHum();
+        }
+        debouncedRequestTempHum();
+
+        function polling() {
+            setTimeout(function () {
+                debouncedRequestTempHum();
+                polling();
+            }, 2500);
+        }
+        polling();
+    </script>
+    <div style="position: absolute">
+        <a href="#" onclick="refresh();" class="floatRefresh">
+            <div style="font-size: xx-large">R</div>
+        </a>
+    </div>
+    <div style="position: absolute">
+        <a href="/logout" class="floatLogout">
+            <div style="font-size: xx-large">L</div>
+        </a>
+    </div>
+
+</body>
+</html>
